@@ -12,6 +12,7 @@ async function main()
 
     const rows: any[] = []
     const customers = await getCustomersList()
+    console.log(customers)
     for (const customerDoc of customers) {
         try {
             const customer = await getCustomerByDocument(customerDoc, api)
@@ -41,9 +42,8 @@ async function main()
             
                 if (index !== -1) {
                     acc[index].contagem++
-                    acc[index].price += contract.price
                 } else {
-                    acc.push({ ...contract, price: contract.price, contagem: 1 })
+                    acc.push({ ...contract, contagem: 1 })
                 }
                 return acc
             }, [])
@@ -54,10 +54,10 @@ async function main()
                     produto: contract.name,
                     valor: contract.price,
                     contagem: contract.contagem,
+                    adicionais: contract.aditionals.join(', ')
                 })
             }
 
-            console.clear()
             console.table(rows)
             console.log([Object.keys(rows[0]), ...rows.map(Object.values),])
             const buffer = xlsx.build([{
