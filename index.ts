@@ -30,12 +30,30 @@ async function main()
                 continue;
             }
             const contracts = await getCustomerContracts(customerDoc, page)
+            
+            const containsWord = (str: string|undefined, word: string) => (str ?? '').toLowerCase().includes(word.toLowerCase())
 
-            for (const contract of contracts) {
+            const newContracts = contracts.reduce((acc: any, contract: any) => {
+                const index = acc.findIndex((item: any) => 
+                    (containsWord(item.name, "fixa") && containsWord(contract.name, "fixa")) ||
+                    (containsWord(item.name, "larga") && containsWord(contract.name, "larga"))
+                )
+            
+                if (index !== -1) {
+                    acc[index].contagem++
+                    acc[index].price += contract.price
+                } else {
+                    acc.push({ ...contract, price: contract.price, contagem: 1 })
+                }
+                return acc
+            }, [])
+
+            for (const contract of newContracts) {
                 rows.push({
                     ...customerData,
                     produto: contract.name,
-                    valor: contract.price
+                    valor: contract.price,
+                    contagem: contract.contagem,
                 })
             }
 
