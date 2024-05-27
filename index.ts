@@ -9,10 +9,10 @@ import { writeFile } from 'fs/promises'
 async function main()
 {
     const [browser, page, api] = await initBrowser()
+    page.setViewport({ width: 1280, height: 1080, deviceScaleFactor: 1 })
 
     const rows: any[] = []
     const customers = await getCustomersList()
-    console.log(customers)
     for (const customerDoc of customers) {
         try {
             const customer = await getCustomerByDocument(customerDoc, api)

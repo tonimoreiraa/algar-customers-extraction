@@ -5,6 +5,13 @@ export async function getCustomersList(): Promise<string[]>
 {
     const content = await readFile('./datagrid.xlsx')
     const document = xlsx.parse(content, { })
-    const customers = document[0].data.slice(1).map(row => row[1])
+    const customers = document[0].data.slice(1)
+        .reduce((acc: any, row: any) => {
+            if (acc.indexOf(row[1]) == -1) {
+                acc.push(row[1])
+            }
+            return acc
+        }, [])
+    console.log(document[0].data.length, customers.length)
     return customers
 }

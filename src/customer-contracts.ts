@@ -24,10 +24,35 @@ export async function getCustomerContracts(customerDoc: string, page: Page)
     })
     await page.waitForSelector('.portletBox td > table > tbody .rich-table-row')
 
-    const rows = await page.$$('.portletBox td > table > tbody .rich-table-row')
+    let rows = await page.$$('.portletBox td > table > tbody .rich-table-row')
+
+    await new Promise(r => setTimeout(r, 1000))
+    // Get agent name
+    await page.evaluate(() => {
+        // @ts-ignore
+        document.querySelector('#nav360 > li:nth-child(1) > ul > li a').click()
+    })
+    await page.waitForSelector('#clienteDetalhado table tr:nth-child(1) td:nth-child(1) tr:nth-child(13) td:nth-child(1) label')
+    const agentElement = await page.$('#clienteDetalhado table tr:nth-child(1) td:nth-child(1) tr:nth-child(13) td:nth-child(2) span')
+    if (agentElement) {
+        const agentName = await page.evaluate(element => element.textContent, agentElement) as string
+        console.log(agentName)
+        await new Promise(r => setTimeout(r, 1000))
+        if (agentName && agentName.length) {
+            console.log('Não cheque')
+            rows = []
+        }
+    }
 
     const contracts: any[] = []
     for (var i = 1; i < rows.length; i++) {
+
+        await page.evaluate(() => {
+            // @ts-ignore
+            document.querySelector('#nav360 > li:nth-child(2) > ul > li:nth-child(1) a').click()
+        })
+        await page.waitForSelector('.portletBox td > table > tbody .rich-table-row')
+        
         if (i > 1) {
             // Abre aba contratos
             await page.evaluate(() => {
@@ -50,7 +75,6 @@ export async function getCustomerContracts(customerDoc: string, page: Page)
         await contractElement.click()
 
         await waitForLoadBar(page)
-
         // Aba de faturamento 
         await page.evaluate(() => {
             // @ts-ignore
@@ -73,7 +97,7 @@ export async function getCustomerContracts(customerDoc: string, page: Page)
         
         const aditionalsElements = Array.from(await page.$$('.rich-table-row td:nth-child(2)'))
         const aditionals = await Promise.all(aditionalsElements.map(async (e) => await page.evaluate(e => e.textContent, e)))
-        contracts.push({ contract, id, name, index: i, price, aditionals,  })
+        contracts.push({ contract, id, name, index: i, price, aditionals, })
     }
 
     return contracts
