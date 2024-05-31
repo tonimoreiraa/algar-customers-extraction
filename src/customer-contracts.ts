@@ -66,10 +66,12 @@ export async function getCustomerContracts(customerDoc: string, page: Page)
         const contractElement = await page.$(`.portletBox td > table > tbody .rich-table-row:nth-child(${i}) td:nth-child(2) a`) as ElementHandle
         const idElement = await page.$(`.portletBox td > table > tbody .rich-table-row:nth-child(${i}) td:nth-child(4)`) as ElementHandle
         const nameElement = await page.$(`.portletBox td > table > tbody .rich-table-row:nth-child(${i}) td:nth-child(5)`) as ElementHandle
+        const loyaltyElement = await page.$(`.portletBox td > table > tbody .rich-table-row:nth-child(${i}) td:nth-child(12)`) as ElementHandle
 
         const contract = await page.evaluate(element => element.textContent, contractElement) as string
         const id = await page.evaluate(element => element.textContent, idElement) as string
         const name = await page.evaluate(element => element.textContent, nameElement) as string
+        const loyalty = await page.evaluate(element => element.textContent, loyaltyElement) as string
 
         // Abre contrato
         await contractElement.click()
@@ -97,7 +99,7 @@ export async function getCustomerContracts(customerDoc: string, page: Page)
         
         const aditionalsElements = Array.from(await page.$$('.rich-table-row td:nth-child(2)'))
         const aditionals = await Promise.all(aditionalsElements.map(async (e) => await page.evaluate(e => e.textContent, e)))
-        contracts.push({ contract, id, name, index: i, price, aditionals, })
+        contracts.push({ contract, id, name, index: i, price, aditionals, loyalty })
     }
 
     return contracts
