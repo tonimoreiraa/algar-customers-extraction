@@ -183,7 +183,6 @@ export interface Contact {
 export interface Determinant {}
   
 export interface CustomerClusterExperienceView {}
-  
 
 export async function getCustomerByDocument(document: string, api: AxiosInstance)
 {
@@ -198,6 +197,7 @@ export async function getCustomerByDocument(document: string, api: AxiosInstance
     const customerResponse = await api.post<CustomerType>(url, customerId, {
         headers: {
             'Content-Type': 'application/json',
+            'masked-fields': '[]'
         }
     })
 
